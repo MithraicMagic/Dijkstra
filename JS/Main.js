@@ -9,6 +9,8 @@ const USERSTATE = {
     setEnd: 1
 }
 
+const dijkstra = new Algorithm();
+
 let currentState = USERSTATE.setup;
 
 const mousePos = {x: 0, y: 0};
@@ -20,13 +22,13 @@ const TILESIZE = 32;
 const FPS = 60;
 
 const vertices = [];
-const rowCount = Math.floor(canvas.clientWidth / TILESIZE);
-const columnCount = Math.floor(canvas.clientHeight / TILESIZE);
+const rowCount = Math.floor(canvas.clientHeight / TILESIZE);
+const columnCount = Math.floor(canvas.clientWidth / TILESIZE);
 
 function init() {
     for (let r = 0; r < rowCount; r++) {
         for (let c = 0; c < columnCount; c++) {
-            vertices.push(new Vertex(r*TILESIZE, c*TILESIZE, TILESIZE));
+            vertices.push(new Vertex(c*TILESIZE, r*TILESIZE, TILESIZE));
         }
     }
 
@@ -34,7 +36,7 @@ function init() {
 }
 
 function draw() {
-    ctx.clearRect(0, 0, canvas.height, canvas.width);
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
 
     vertices.forEach(v => v.draw());
 }
@@ -48,13 +50,31 @@ function onMouseDown(m) {
     let success = false;
 
     vertices.forEach(v => {
-        if (v.checkOverlap(mousePos.x, mousePos.y)) {
-            currentState === USERSTATE.setup ? v.state = STATE.begin : v.state = STATE.end;
-            success = true;
+        if (!success && v.checkOverlap(mousePos.x, mousePos.y)) {
+            if (m.button === 0) {
+                if (currentState === USERSTATE.setup) {
+                    dijkstra.reset();
+
+                    v.type = TYPE.BEGIN;
+                    dijkstra.start = v;
+                    currentState = USERSTATE.setEnd;
+
+                    return;
+                } else {
+                    v.type = TYPE.END;
+                    dijkstra.target = v;
+                    currentState = USERSTATE.setup;
+
+                    dijkstra.findPath();
+
+                    return;
+                }
+            } else if (m.button === 2) {
+                v.type === TYPE.WALL ? v.type = TYPE.NEUTRAL : v.type = TYPE.WALL;
+                return;
+            }
         }
     });
-
-    if (success) currentState === USERSTATE.setup ? currentState = USERSTATE.setEnd : currentState = USERSTATE.setup;
 }
 
 init();
