@@ -7,7 +7,12 @@
     <title>DijkstraJS</title>
 </head>
 <body>
-    <canvas id="canvas" width="1280" height="704"oncontextmenu="return false;"></canvas>
+    <div class="controls">
+        <button id="mode" onclick="switchMode()"></button>
+        <label>Delay:</label>
+        <input type="range" value="10" min="0" max="100" oninput="delay = parseInt(this.value)">
+    </div>
+    <canvas id="canvas" width="1280" height="704"></canvas>
     <script src="JS/Vertex.js"></script>
     <script src="JS/Algorithm.js"></script>
     <script src="JS/Main.js"></script>

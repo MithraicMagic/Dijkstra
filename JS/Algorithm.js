@@ -78,7 +78,7 @@ class Algorithm {
         if (this.nextIndex !== -1) this.current = this.possibilities[nextIndex];
 
         if (this.current !== this.target && this.possibilities.length !== 0) {
-            setTimeout(() => this.moveThroughVertices(), 5);
+            delay === 0 ? this.moveThroughVertices() : setTimeout(() => this.moveThroughVertices(), delay);
         } else if (this.current === this.target) {
             this.showPath();
         }

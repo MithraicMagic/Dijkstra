@@ -6,7 +6,7 @@ const TYPE = {
     PATH: 4
 }
 
-const COLORS = ["gray", "green", "red", "black", "orange"];
+const COLORS = ["gray", "rgb(100, 175, 100)", "rgb(175, 100, 100)", "black", "rgb(100, 100, 175)"];
 
 class Vertex {
     constructor(x, y, tileSize) {
@@ -30,7 +30,7 @@ class Vertex {
             ctx.strokeRect(this.x, this.y, this.tileSize, this.tileSize)
         } else {
             if (this.visited && !(this.type === TYPE.BEGIN || this.type === TYPE.END || this.type === TYPE.PATH)) {
-                ctx.fillStyle = "white";
+                ctx.fillStyle = "rgb(150, 150, 150)";
             } else {
                 ctx.fillStyle = COLORS[this.type];
             }

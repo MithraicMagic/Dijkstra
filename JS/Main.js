@@ -4,18 +4,35 @@ const canvas = document.getElementById('canvas');
 /** @type {CanvasRenderingContext2D} */
 const ctx = canvas.getContext('2d');
 
+let delay = 10;
+
+let mode = -1;
+let dragging = false;
+const MODE = {
+    points: 0,
+    placeWalls: 1,
+    eraseWalls: 2
+}
+
+const modeHtml = [
+    '<span style="color: rgb(100, 150, 100);">Begin</span> / <span style="color: rgb(150, 100, 100);">End</span> Setup',
+    'Build Walls',
+    'Erase Walls'
+]
+
 const USERSTATE = {
-    setup: 0,
+    setStart: 0,
     setEnd: 1
 }
 
 const dijkstra = new Algorithm();
 
-let currentState = USERSTATE.setup;
+let currentState = USERSTATE.setStart;
 
 const mousePos = {x: 0, y: 0};
 canvas.addEventListener('mousemove', onMouseMove);
 canvas.addEventListener('mousedown', onMouseDown);
+window.addEventListener('mouseup', onMouseUp);
 
 let mainInterval;
 const TILESIZE = 32;
@@ -32,6 +49,8 @@ function init() {
         }
     }
 
+    switchMode();
+
     mainInterval = setInterval(draw, FPS/1000);
 }
 
@@ -44,15 +63,26 @@ function draw() {
 function onMouseMove(m) {
     mousePos.x = m.clientX - canvas.offsetLeft;
     mousePos.y = m.clientY - canvas.offsetTop;
+
+    if (dragging) {
+        vertices.forEach(v => {
+            if (v.checkOverlap(mousePos.x, mousePos.y)) {
+                v.type = mode === MODE.placeWalls ? TYPE.WALL : TYPE.NEUTRAL;
+                return;
+            }
+        })
+    }
 }
 
 function onMouseDown(m) {
+    if (m.button !== 0) return;
+
     let success = false;
 
     vertices.forEach(v => {
         if (!success && v.checkOverlap(mousePos.x, mousePos.y)) {
-            if (m.button === 0) {
-                if (currentState === USERSTATE.setup) {
+            if (mode === MODE.points) {
+                if (currentState === USERSTATE.setStart) {
                     dijkstra.reset();
 
                     v.type = TYPE.BEGIN;
@@ -63,18 +93,29 @@ function onMouseDown(m) {
                 } else {
                     v.type = TYPE.END;
                     dijkstra.target = v;
-                    currentState = USERSTATE.setup;
+                    currentState = USERSTATE.setStart;
 
                     dijkstra.findPath();
 
                     return;
                 }
-            } else if (m.button === 2) {
-                v.type === TYPE.WALL ? v.type = TYPE.NEUTRAL : v.type = TYPE.WALL;
+            } else {
+                v.type = mode === MODE.placeWalls ? TYPE.WALL : TYPE.NEUTRAL;
+                dragging = true;
                 return;
             }
         }
     });
+}
+
+function onMouseUp(m) {
+    if (m.button !== 0) return;
+    dragging = false;
+}
+
+function switchMode() {
+    mode = (mode + 1) % 3;
+    document.getElementById('mode').innerHTML = modeHtml[mode];
 }
 
 init();
