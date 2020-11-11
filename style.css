@@ -22,6 +22,10 @@ body {
     margin: auto auto 10px auto;
 }
 
+#result {
+    margin: 10px auto auto auto;
+}
+
 button {
     margin: 0 10px;
     border: none;

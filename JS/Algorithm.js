@@ -5,6 +5,9 @@ class Algorithm {
         this.start = null;
         this.target = null;
 
+        this.beginTime = null;
+        this.endTime = null;
+
         this.current = null;
     }
 
@@ -41,12 +44,11 @@ class Algorithm {
         this.start.distance = 0;
         this.current = this.start;
 
+        this.beginTime = new Date();
         this.moveThroughVertices();
     }
 
     moveThroughVertices() {
-        console.log(this.current);
-
         if (this.current !== this.start) {
             this.possibilities.splice(this.possibilities.findIndex(p => p === this.current), 1);
         }
@@ -80,6 +82,8 @@ class Algorithm {
         if (this.current !== this.target && this.possibilities.length !== 0) {
             delay === 0 ? this.moveThroughVertices() : setTimeout(() => this.moveThroughVertices(), delay);
         } else if (this.current === this.target) {
+            this.endTime = new Date();
+            document.getElementById('result').innerText = 'Time: ' + (this.endTime - this.beginTime) + 'ms';
             this.showPath();
         }
     }
